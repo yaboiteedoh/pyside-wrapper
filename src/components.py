@@ -10,13 +10,11 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
-    QWidget,
     QFrame,
     QSizePolicy,
     QScrollArea,
     QVBoxLayout,
-    QGridLayout,
-    QPushButton
+    QGridLayout
 )
 
 
@@ -153,26 +151,28 @@ class TFrame(QFrame):
             self.setLineWidth(line_width)
             self.setMidLineWidth(mid_line_width)
 
-        if size_policy == 'xy':
-            self.size_policy = [
-                QSizePolicy.Policy.Expanding,
-                QSizePolicy.Policy.Expanding
-            ]
-        elif size_policy == 'x':
-            self.size_policy = [
-                QSizePolicy.Policy.Expanding,
-                QSizePolicy.Policy.Minimum
-            ]
-        elif size_policy == 'y':
-            self.size_policy = [
-                QSizePolicy.Policy.Minimum,
-                QSizePolicy.Policy.Expanding
-            ]
-        elif size_policy == '':
-            self.size_policy = [
-                QSizePolicy.Policy.Minimum,
-                QSizePolicy.Policy.Minimum
-            ]
+        if size_policy is not None:
+            match size_policy:
+                case 'xy':
+                    self.size_policy = [
+                        QSizePolicy.Policy.Expanding,
+                        QSizePolicy.Policy.Expanding
+                    ]
+                case 'x':
+                    self.size_policy = [
+                        QSizePolicy.Policy.Expanding,
+                        QSizePolicy.Policy.Minimum
+                    ]
+                case 'y':
+                    self.size_policy = [
+                        QSizePolicy.Policy.Minimum,
+                        QSizePolicy.Policy.Expanding
+                    ]
+                case '':
+                    self.size_policy = [
+                        QSizePolicy.Policy.Minimum,
+                        QSizePolicy.Policy.Minimum
+                    ]
 
         self.style_class = style_class
         self.cur_row = 0
