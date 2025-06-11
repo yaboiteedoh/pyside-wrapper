@@ -1,4 +1,7 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import (
+    Qt,
+    Signal
+)
 from PySide6.QtGui import (
     QAction,
     QKeySequence
@@ -6,7 +9,12 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
+    QWidget,
     QFrame,
+    QSizePolicy,
+    QScrollArea,
+    QVBoxLayout,
+    QGridLayout,
     QPushButton
 )
 
@@ -17,19 +25,36 @@ PRIORITIES = {
     'high': QAction.Priority.HighPriority
 }
 
+FRAME_SHAPES = {
+    'none': QFrame.Shape.NoFrame,
+    'box': QFrame.Shape.Box,
+    'panel': QFrame.Shape.Panel,
+    'styled': QFrame.Shape.StyledPanel,
+    'hline': QFrame.Shape.HLine,
+    'vline': QFrame.Shape.VLine,
+    'win': QFrame.Shape.WinPanel
+}
+
+SHADOW_STYLES = {
+    'plain': QFrame.Shadow.Plain,
+    'raised': QFrame.Shadow.Raised,
+    'sunken': QFrame.Shadow.Sunken
+}
+
 
 class TAction(QAction):
     def __init__(
         self,
         text,
-        parent=None,
-        shortcut=None,
         func=None,
+        shortcut=None,
+        priority='normal',
+        connection_type=Qt.AutoConnection,
+        parent=None,
+        menu=None,
         group=None,
         auto_repeat=False,
-        checkable=False,
-        menu=None,
-        priority='normal'
+        checkable=False
     ):
         super().__init__(
             text,
@@ -48,7 +73,7 @@ class TAction(QAction):
         if shortcut:
             self.setShortcut(QKeySequence(shortcut))
         if func:
-            self.triggered.connect(func)
+            self.triggered.connect(func, type=connection_type)
         if parent:
             parent.addAction(self)
 
@@ -57,7 +82,7 @@ class TAction(QAction):
         self.triggered.emit()
 
 
-class App():
+class TApp(QWidget):
     def __init__(
         self,
         title=None,
@@ -68,12 +93,12 @@ class App():
 
         self.force_close = TAction(
             'Force Close',
-            parent=self.window,
             shortcut='Ctrl+d',
             priority='high',
-            func=lambda: self.window.close()
+            connection_type=Qt.DirectConnection,
+            parent=self.window,
+            func=self.window.close
         )
-
         if title:
             self.window.setWindowTitle(title)
         if geometry:
@@ -81,12 +106,28 @@ class App():
 
         self.window.show()
 
+        frame = TFrame(
+            frame_style=['box', 'plain', 3, 3]
+        )
+        self.warn_greedy(frame)
+        frame.greedy.emit()
+
+
+    def warn_greedy(self, widget):
+        widget.greedy.connect(lambda: self.surrender(widget))
+
+
+    def surrender(self, widget):
+        self.window.setCentralWidget(widget)
+
 
     def exec(self):
         self.app.exec()
 
 
 class TFrame(QFrame):
+    greedy = Signal()
+
     def __init__(
         self,
         *args,
@@ -96,12 +137,21 @@ class TFrame(QFrame):
         size_policy='xy',
         label=None,
         accept_drops=False,
+        frame_style=['none', 'plain', 0, 0],
         **kwargs
     ):
         super().__init__(*args, **kwargs)
         
         if accept_drops:
             self.setAcceptDrops(True)
+
+        if frame_style:
+            frame_shape, shadow_style, line_width, mid_line_width = frame_style
+            self.setFrameStyle(
+                FRAME_SHAPES[frame_shape] | SHADOW_STYLES[shadow_style]
+            )
+            self.setLineWidth(line_width)
+            self.setMidLineWidth(mid_line_width)
 
         if size_policy == 'xy':
             self.size_policy = [
@@ -135,14 +185,13 @@ class TFrame(QFrame):
         self.layout = QGridLayout()
         self.container = QWidget()
 
-        self.scroll = QScrollArea()
-
-        self.scroll.setWidgetResizable(True)
-        self.scroll.setWidget(self.container)
         self.container.setLayout(self.layout)
         self.container.setSizePolicy(*self.size_policy)
 
         if scrollbar is not None:
+            self.scroll = QScrollArea()
+            self.scroll.setWidgetResizable(True)
+            self.scroll.setWidget(self.container)
             if scrollbar == 'v':
                 self.scroll.setVerticalScrollBarPolicy(
                     Qt.ScrollBarPolicy.ScrollBarAsNeeded
@@ -164,12 +213,14 @@ class TFrame(QFrame):
                 self.scroll.setHorizontalScrollBarPolicy(
                     Qt.ScrollBarPolicy.ScrollBarAsNeeded
                 )
+            self.main_layout.addWidget(self.scroll)
+        else:
+            self.main_layout.addWidget(self.container)
 
         if label:
             self.label = QLabel(label)
             self.main_layout.addWidget(self.label)
 
-        self.main_layout.addWidget(self.scroll)
         self.setLayout(self.main_layout)
 
 
@@ -228,6 +279,13 @@ class TFrame(QFrame):
     def center_widget(self, widget):
         i = self.layout.indexOf(widget)
         self.layout.setAlignment(widget, Qt.AlignmentFlag.AlignCenter)
+
+
+    def focus_widget(self, widget):
+        for child in self.children:
+            child.setHidden(True)
+            if child == widget:
+                child.setHidden(False)
 
 
     @property
