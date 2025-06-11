@@ -1,6 +1,7 @@
 from PySide6.QtCore import (
     Qt,
-    Signal
+    Signal,
+    QObject
 )
 from PySide6.QtGui import (
     QAction,
@@ -82,12 +83,14 @@ class TAction(QAction):
         self.triggered.emit()
 
 
-class TApp(QWidget):
+class TApp(QObject):
     def __init__(
         self,
         title=None,
         geometry=[]
     ):
+        super().__init__()
+
         self.app = QApplication([])
         self.window = QMainWindow()
 
@@ -107,18 +110,15 @@ class TApp(QWidget):
         self.window.show()
 
         frame = TFrame(
+            max_columns=1,
             frame_style=['box', 'plain', 3, 3]
         )
-        self.warn_greedy(frame)
+        frame.greedy.connect(self.surrender)
         frame.greedy.emit()
 
 
-    def warn_greedy(self, widget):
-        widget.greedy.connect(lambda: self.surrender(widget))
-
-
-    def surrender(self, widget):
-        self.window.setCentralWidget(widget)
+    def surrender(self):
+        self.window.setCentralWidget(self.sender())
 
 
     def exec(self):
