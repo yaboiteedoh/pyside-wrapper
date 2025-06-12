@@ -13,11 +13,13 @@ class TLabeledInput(TFlexFrame):
         text,
         *args,
         flex='h',
+        size_policy='',
         **kwargs
     ):
         super().__init__(
             *args,
             flex=flex,
+            size_policy=size_policy,
             **kwargs
         )
 

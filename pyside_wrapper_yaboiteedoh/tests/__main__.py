@@ -10,9 +10,7 @@ class App(TApp):
     def __init__(self):
         super().__init__(title='Testing')
 
-        frame = TFlexFrame(
-            frame_style=['box', 'plain', 3, 3]
-        )
+        frame = TFlexFrame(frame_style=['box', 'plain', 3, 3])
         label = frame.add_widget(
             TLabeledInput(
                 'TESTING',
@@ -20,6 +18,7 @@ class App(TApp):
             )
         )
         spacer = frame.add_widget(TFlexFrame(), stretch=1)
+
         frame.greedy.connect(self.surrender)
         frame.greedy.emit()
         frame.value = 'YUGE'
