@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QScrollArea,
     QVBoxLayout,
+    QHBoxLayout,
     QGridLayout,
     QLabel
 )
@@ -119,12 +120,13 @@ class TApp(QObject):
         self.app.exec()
 
 
-class TFrame(QFrame):
+class TFlexFrame(QFrame):
     greedy = Signal()
 
     def __init__(
         self,
         *args,
+        flex='v',
         max_columns=None,
         style_class=None,
         scrollbar=None,
@@ -170,6 +172,7 @@ class TFrame(QFrame):
                         QSizePolicy.Policy.Minimum
                     ]
 
+        self.flex = flex
         self.style_class = style_class
         self.cur_row = 0
         self.cur_column = 0
@@ -178,12 +181,21 @@ class TFrame(QFrame):
         self._children = []
 
         self.main_layout = QVBoxLayout(self)
-        self.layout = QGridLayout()
         self.container = QWidget()
+
+        match self.flex:
+            case 'v':
+                self.layout = QVBoxLayout()
+            case 'h':
+                self.layout = QHBoxLayout()
+            case _:
+                self.layout = QGridLayout()
 
         self.container.setLayout(self.layout)
         self.setSizePolicy(*self.size_policy)
         self.container.setSizePolicy(*self.size_policy)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
 
         if label:
             self.label = QLabel(label)
@@ -193,32 +205,32 @@ class TFrame(QFrame):
             self.scroll = QScrollArea()
             self.scroll.setWidgetResizable(True)
             self.scroll.setWidget(self.container)
-            if scrollbar == 'v':
-                self.scroll.setVerticalScrollBarPolicy(
-                    Qt.ScrollBarPolicy.ScrollBarAsNeeded
-                )
-                self.scroll.setHorizontalScrollBarPolicy(
-                    Qt.ScrollBarPolicy.ScrollBarAlwaysOff
-                )
-            elif scrollbar == 'h':
-                self.scroll.setVerticalScrollBarPolicy(
-                    Qt.ScrollBarPolicy.ScrollBarAlwaysOff
-                )
-                self.scroll.setHorizontalScrollBarPolicy(
-                    Qt.ScrollBarPolicy.ScrollBarAsNeeded
-                )
-            elif scrollbar == 'both':
-                self.scroll.setVerticalScrollBarPolicy(
-                    Qt.ScrollBarPolicy.ScrollBarAsNeeded
-                )
-                self.scroll.setHorizontalScrollBarPolicy(
-                    Qt.ScrollBarPolicy.ScrollBarAsNeeded
-                )
+            match scrollbar:
+                case 'v':
+                    self.scroll.setVerticalScrollBarPolicy(
+                        Qt.ScrollBarPolicy.ScrollBarAsNeeded
+                    )
+                    self.scroll.setHorizontalScrollBarPolicy(
+                        Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+                    )
+                case 'h':
+                    self.scroll.setVerticalScrollBarPolicy(
+                        Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+                    )
+                    self.scroll.setHorizontalScrollBarPolicy(
+                        Qt.ScrollBarPolicy.ScrollBarAsNeeded
+                    )
+                case 'both':
+                    self.scroll.setVerticalScrollBarPolicy(
+                        Qt.ScrollBarPolicy.ScrollBarAsNeeded
+                    )
+                    self.scroll.setHorizontalScrollBarPolicy(
+                        Qt.ScrollBarPolicy.ScrollBarAsNeeded
+                    )
             self.main_layout.addWidget(self.scroll)
         else:
             self.main_layout.addWidget(self.container)
 
-        self.main_layout.setStretch(1, 1)
         self.setLayout(self.main_layout)
 
 
@@ -233,18 +245,23 @@ class TFrame(QFrame):
             self.add_widget(o)
 
     
-    def add_widget(self, widget):
-        print(widget, self.cur_row, self.cur_column)
-        self.layout.addWidget(widget, self.cur_row, self.cur_column)
+    def add_widget(self, widget, stretch=0):
+        match self.flex:
+            case 'v' | 'h':
+                print(widget, len(self.children))
+                self.layout.addWidget(widget, stretch=stretch)
+            case _:
+                print(widget, self.cur_row, self.cur_column)
+                self.layout.addWidget(widget, self.cur_row, self.cur_column)
+     
+                self.cur_column += 1
+
+                if self.max_columns:
+                    if self.cur_column >= self.max_columns:
+                        self.cur_row += 1
+                        self.cur_column = 0
+
         self._children.append(widget)
-
-        self.cur_column += 1
-
-        if self.max_columns:
-            if self.cur_column >= self.max_columns:
-                self.cur_row += 1
-                self.cur_column = 0
-
         return widget
 
 

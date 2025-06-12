@@ -4,21 +4,20 @@ from PySide6.QtWidgets import (
     QRadioButton
 )
 
-from .components import TFrame
+from .components import TFlexFrame
 
 
-class TLabeledInput(TFrame):
+class TLabeledInput(TFlexFrame):
     def __init__(
         self,
         text,
         *args,
-        horizontal=True,
+        flex='h',
         **kwargs
     ):
-        max_columns = None if horizontal else 1
         super().__init__(
             *args,
-            max_columns=max_columns,
+            flex=flex,
             **kwargs
         )
 
@@ -48,7 +47,7 @@ class TLabeledInput(TFrame):
         return self.input.setText(value)
 
 
-class RadioMenu(TFrame):
+class RadioMenu(TFlexFrame):
     def __init__(
         self,
         label,
