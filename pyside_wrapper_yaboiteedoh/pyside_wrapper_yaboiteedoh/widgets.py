@@ -1,8 +1,51 @@
 from PySide6.QtWidgets import (
+    QLabel,
+    QLineEdit,
     QRadioButton
 )
 
 from .components import TFrame
+
+
+class TLabeledInput(TFrame):
+    def __init__(
+        self,
+        text,
+        *args,
+        horizontal=True,
+        **kwargs
+    ):
+        max_columns = None if horizontal else 1
+        super().__init__(
+            *args,
+            max_columns=max_columns,
+            **kwargs
+        )
+
+        self.label = QLabel(text)
+        self.input = QLineEdit()
+        self.add_widget(self.label)
+        self.add_widget(self.input)
+
+    
+    @property
+    def text(self):
+        return self.label.text()
+
+
+    @text.setter
+    def text(self, value):
+        self.label.setText(value)
+
+
+    @property
+    def value(self):
+        return self.input.text()
+
+
+    @value.setter
+    def value(self, value):
+        return self.input.setText(value)
 
 
 class RadioMenu(TFrame):
