@@ -98,7 +98,8 @@ class TRadioMenu(TFlexFrame):
     def value(self, value):
         if value in self.options:
             for option in self.children:
+                option.setChecked(False)
                 if option.text() == value:
-                    option.setChecked()
+                    option.setChecked(True)
                     self.selectionChanged.emit(value)
     
