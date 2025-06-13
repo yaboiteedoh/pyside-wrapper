@@ -1,3 +1,4 @@
+from PySide.Core import Signal
 from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
@@ -50,6 +51,7 @@ class TLabeledInput(TFlexFrame):
 
 
 class TRadioMenu(TFlexFrame):
+    selectionChanged = Signal(str)
     def __init__(
         self,
         *args,
@@ -90,6 +92,7 @@ class TRadioMenu(TFlexFrame):
         for option in self.children:
             if option.isChecked():
                 return option.text()
+        self.selectionChanged.emit(value)
 
 
     @value.setter
