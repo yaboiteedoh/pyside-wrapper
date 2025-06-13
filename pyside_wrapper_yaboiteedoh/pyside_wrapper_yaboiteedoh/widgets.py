@@ -52,7 +52,6 @@ class TLabeledInput(TFlexFrame):
 class TRadioMenu(TFlexFrame):
     def __init__(
         self,
-        label,
         *args,
         options=[],
         default='',
@@ -61,7 +60,6 @@ class TRadioMenu(TFlexFrame):
     ):
         super().__init__(
             *args,
-            label=label,
             size_policy=size_policy,
             **kwargs
         )
