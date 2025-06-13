@@ -49,7 +49,7 @@ class TLabeledInput(TFlexFrame):
         return self.input.setText(value)
 
 
-class RadioMenu(TFlexFrame):
+class TRadioMenu(TFlexFrame):
     def __init__(
         self,
         label,
