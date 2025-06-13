@@ -1,4 +1,4 @@
-from PySide.Core import Signal
+from PySide6.Core import Signal
 from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
