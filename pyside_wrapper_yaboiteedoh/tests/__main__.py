@@ -1,9 +1,9 @@
 from pyside_wrapper_yaboiteedoh.components import (
-    TApp
+    TApp,
+    TCheckBox
 )
 from pyside_wrapper_yaboiteedoh.widgets import (
-    TFlexFrame,
-    TLabeledInput
+    TFlexFrame
 )
 
 class App(TApp):
@@ -12,9 +12,8 @@ class App(TApp):
 
         frame = TFlexFrame(frame_style=['box', 'plain', 3, 3])
         label = frame.add_widget(
-            TLabeledInput(
-                'TESTING',
-                frame_style=['box', 'plain', 3, 3]
+            TCheckBox(
+                'TESTING'
             )
         )
         spacer = frame.add_widget(TFlexFrame(), stretch=1)

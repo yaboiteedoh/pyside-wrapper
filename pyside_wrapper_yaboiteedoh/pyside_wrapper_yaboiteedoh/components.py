@@ -17,7 +17,8 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QGridLayout,
-    QLabel
+    QLabel,
+    QCheckBox
 )
 
 
@@ -306,5 +307,38 @@ class TFlexFrame(QFrame):
     @property
     def children(self):
         return [child for child in self._children]
+
+
+class TCheckBox(QCheckBox):
+    def __init__(
+        self,
+        *args,
+        text=None,
+        **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+
+        if text:
+            self.text = text
+
+
+    @property
+    def text(self):
+        return self.text()
+
+
+    @text.setter
+    def text(self, value):
+        self.setText(value)
+
+
+    @property
+    def checked(self):
+        return self.checkState()
+
+
+    @checked.setter
+    def checked(self, value):
+        self.checkState(value)
 
 
