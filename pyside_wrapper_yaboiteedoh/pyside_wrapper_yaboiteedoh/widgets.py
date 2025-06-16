@@ -52,6 +52,7 @@ class TLabeledInput(TFlexFrame):
 
 class TRadioMenu(TFlexFrame):
     selectionChanged = Signal(str)
+
     def __init__(
         self,
         *args,
@@ -73,7 +74,7 @@ class TRadioMenu(TFlexFrame):
 
     @property
     def options(self):
-        return [option.text() for option in self.children]
+        return [option.text() for option in self._children]
 
 
     @options.setter
