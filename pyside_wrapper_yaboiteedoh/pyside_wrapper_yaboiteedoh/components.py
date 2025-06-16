@@ -271,13 +271,9 @@ class TFlexFrame(QFrame):
         self.cur_row = 0
 
         for child in self.children:
-            self.layout.removeWidget(child)
-            self._children.remove(child)
-
-            if child == widget:
-                child.setParent(None)
-                child.deleteLater()
-            else:
+            child.setParent(None)
+            child.deleteLater()
+            if child != widget:
                 self.add_widget(widget)
 
 
@@ -339,6 +335,6 @@ class TCheckBox(QCheckBox):
 
     @checked.setter
     def checked(self, value):
-        self.checkState(value)
+        self.setCheckState(value)
 
 
