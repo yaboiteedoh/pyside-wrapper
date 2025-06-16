@@ -270,12 +270,16 @@ class TFlexFrame(QFrame):
         self.cur_column = 0
         self.cur_row = 0
 
-        for child in self.layout.children():
-            child.setParent(None)
-            child.deleteLater()
+        for child in self.children:
+            self.layout.removeWidget(child)
+            self._children.remove(child)
 
-            if child != widget:
+            if child == widget:
+                child.setParent(None)
+                child.deleteLater()
+            else:
                 self.add_widget(widget)
+        self.update()
 
 
     def clear_widgets(self):
