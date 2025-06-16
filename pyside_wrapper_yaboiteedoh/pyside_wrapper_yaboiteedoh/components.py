@@ -270,9 +270,10 @@ class TFlexFrame(QFrame):
         self.cur_column = 0
         self.cur_row = 0
 
-        for child in self.children:
+        for child in self.layout.children:
             child.setParent(None)
             child.deleteLater()
+
             if child != widget:
                 self.add_widget(widget)
 
