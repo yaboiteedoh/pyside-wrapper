@@ -80,11 +80,18 @@ class TRadioMenu(TFlexFrame):
     @options.setter
     def options(self, options: list[str]):
         selection = self.value
+
         self.clear_widgets()
+
         self.populate(
             QRadioButton,
             [{'text': option} for option in options]
         )
+        for option in self._children:
+            option.toggled.connect(
+                lambda active, o=option.text(): self.update_value(active, o)
+            )
+
         self.value = selection
 
 
@@ -102,5 +109,10 @@ class TRadioMenu(TFlexFrame):
                 option.setChecked(False)
                 if option.text() == value:
                     option.setChecked(True)
-                    self.selectionChanged.emit(value)
+                    self.selectionChanged.emit(option.text())
     
+
+    def update_value(self, active, value):
+        if active:
+            self.selectionChanged.emit(value)
+

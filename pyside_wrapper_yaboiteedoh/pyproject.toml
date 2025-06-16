@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyside-wrapper-yaboiteedoh"
-version = "0.1.23"
+version = "0.1.39"
 description = ""
 authors = ["yaboiteedoh <cook.brandon624@gmail.com>"]
 
