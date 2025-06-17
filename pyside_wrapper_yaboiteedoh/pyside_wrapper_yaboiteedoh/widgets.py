@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QRadioButton
 )
 
-from .components import TFlexFrame
+from .components import TFlexFrame, TCheckBox
 
 
 class TLabeledInput(TFlexFrame):
@@ -115,3 +115,56 @@ class TRadioMenu(TFlexFrame):
         if active:
             self.selectionChanged.emit(value)
 
+
+class TCheckBoxMatrix(TFlexFrame):
+    def __init__(
+        self,
+        *args,
+        options=[],
+        default='',
+        size_policy='',
+        **kwargs
+    ):
+        super().__init__(
+            *args,
+            size_policy=size_policy,
+            **kwargs
+        )
+
+        self.options = options
+        if default:
+            self.value = default
+
+
+    @property
+    def options(self):
+        return [option.text() for option in self._children]
+
+
+    @options.setter
+    def options(self, options: list[str]):
+        selection = self.value
+        self.clear_widgets()
+        self.populate(
+            TCheckBox,
+            [{'text': option} for option in options]
+        )
+        self.value = selection
+        
+
+
+    @property
+    def value(self):
+        return [
+            option.text for option in self._children
+            if option.isChecked()
+        ]
+
+    @value.setter
+    def value(self, values):
+        for value in values:
+            if value in self.options:
+                for option in self._children:
+                    if option.text() == value:
+                        option.setChecked(True)
+ 
