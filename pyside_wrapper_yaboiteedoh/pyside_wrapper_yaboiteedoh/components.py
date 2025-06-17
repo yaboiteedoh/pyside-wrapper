@@ -96,12 +96,15 @@ class TApp(QObject):
         self.app = QApplication([])
         self.window = QMainWindow()
 
+        self.menu = self.window.menuBar()
+        self.file_menu = self.menu.addMenu('&File')
+
         self.force_close = TAction(
-            'Force Close',
+            'Exit Application',
             shortcut='Ctrl+d',
             priority='high',
             connection_type=Qt.DirectConnection,
-            parent=self.window,
+            parent=self.file_menu,
             func=self.window.close
         )
         if title:
@@ -278,7 +281,7 @@ class TFlexFrame(QFrame):
                 child.setParent(None)
                 child.deleteLater()
             else:
-                self.add_widget(widget)
+                self.add_widget(child)
         self.update()
 
 
@@ -335,11 +338,15 @@ class TCheckBox(QCheckBox):
 
     @property
     def checked(self):
-        return self.checkState()
+        return self.checkState() == Qt.CheckState.Checked
 
 
     @checked.setter
     def checked(self, value):
-        self.setCheckState(value)
+        if value:
+            state = Qt.CheckState.Checked
+        else:
+            state = Qt.CheckState.Unchecked
+        self.setCheckState(state)
 
 
